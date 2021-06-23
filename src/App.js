@@ -22,7 +22,8 @@ class App extends React.Component {
       "Favourite": false
     }
   ],
-  searchValue:''
+  searchValue: '',
+  currentPage: 1
 }
  
   }
@@ -37,12 +38,16 @@ class App extends React.Component {
     });
     return friends;
   }
-  handleFavClick= name =>{
+  handleInteraction= (name,operation) =>{
     const friendsList = this.state.friends.map(obj => ({...obj}));
     const index = friendsList.findIndex(e =>e.Name === name);
     if(index>=0){
-      friendsList[index].Favourite = !friendsList[index].Favourite;
-      this.setState({...this.state.friends,friends:friendsList,original:friendsList});
+      if(operation ===1){ // favourite operation
+        friendsList[index].Favourite = !friendsList[index].Favourite;  
+      }else{ //delete operation
+        friendsList.splice(index, 1);
+      }
+      this.setState({...this.state.friends,friends:friendsList,original:friendsList,currentPage:1});
     }
   }
   searchFriend =event=> {
@@ -65,6 +70,22 @@ class App extends React.Component {
     }
   }
 
+  paginationClick = (i) =>{
+    this.setState({...this.state,currentPage:i});
+  }
+  getPages=()=>{
+    const pageNo = Math.ceil(this.state.friends.length/4);
+    let pagination=Array(pageNo).fill().map((_,i) => {
+        return(
+          <li onClick={()=>this.paginationClick(i+1)}>{i+1}</li>
+        )
+    });
+    
+    if(pageNo>1){
+      return(<ul className="pagination">{pagination}</ul>)
+    }
+  }
+
   componentDidUpdate(prevProps, prevState){
     const friendsCount = this.state.friends.length;
     if(prevState.searchValue!==this.state.searchValue){
@@ -83,22 +104,29 @@ class App extends React.Component {
     }
   }
   render(){
-    const friendsList = this.state.friends.map((details,i)=> 
-      <Friend 
-        details={details} 
-        key={details.Name} 
-        handleFavClick={this.handleFavClick}
-      />
+    const currentPage = this.state.currentPage;
+    const friendsList = this.state.friends.map((details,i)=> {
+      if(i>=(currentPage-1)*4 && i+1<=currentPage*4){
+        return(
+        <Friend 
+          details={details} 
+          key={details.Name} 
+          handleInteraction={this.handleInteraction}
+        />)
+      }
+    }
   );
   return (
     <div className="App">
-      <header className="App-header">   
+      <section className="App-header">   
       <h2>Friends</h2>
-      <input value={this.state.searchValue} onChange={this.searchFriend} onKeyDown={this.handleKeyDown}/>
-      <div className="wrapper">
-        {friendsList}
-      </div>
-      </header>
+      <input className="inputBox" value={this.state.searchValue} onChange={this.searchFriend} onKeyDown={this.handleKeyDown}/>
+      {friendsList.length>0 ?
+        <div className="wrapper">
+          {friendsList}
+        </div> : null}
+        <div>{this.getPages()}</div>
+      </section>
     </div>
   );
   }

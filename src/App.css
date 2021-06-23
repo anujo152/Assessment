@@ -1,11 +1,10 @@
-.App {
-  text-align: center;
-}
-
 .wrapper{
   border: 1px solid grey;
   border-radius: 3px;
-  width: 600px;
+  width: fit-content;
+  padding: 8px;
+  background-color: white;
+  color: black;
 }
 
 .App-header {
@@ -16,8 +15,22 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  align-items: center;
 }
 
 .App-link {
   color: #61dafb;
+}
+
+.inputBox{
+  width: 400px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.pagination > li{
+  float: left;
+}
+::marker{
+  display: none;
 }
